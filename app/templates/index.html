@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bad Words List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            padding: 10px 0;
+            text-align: center; /* Center the header content */
+        }
+        .header h1 {
+            font-size: 2em; /* Increase title size */
+        }
+        .header form {
+            display: inline-block; /* Center the forms */
+            margin: 0 10px;
+        }
+        .sort-buttons {
+            float: right; /* Move sort buttons to the right */
+            margin-right: 20px;
+        }
+        .logout-button {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+        }
+        .login-button {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+        }
+        .content {
+            margin-top: 200px; /* Adjust this value based on the height of the header */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 10px;
+        }
+        .col1 {
+            width: 100px;
+        }
+        .col2 {
+            width: 200px;
+        }
+        .col3 {
+            width: fit-content;
+        }
+        .table-container {
+            max-height: 600px; /* Adjusted value */
+            overflow-y: auto;
+            position: relative; /* To position the delete button relative to this container */
+        }
+        .delete-button {
+            position: fixed; /* Fix the button position */
+            top: 150px; /* Adjust this value based on the header and content margin */
+            z-index: 1001; /* Ensure it appears above other content */
+            background-color: white; /* Match the background to avoid overlap issues */
+        }
+    </style>
+    <script>
+        function redirectToPage(url) {
+            window.location.href = url;  
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>Bad Words List</h1>
+        <form action="/search" method="get">
+            <input type="text" name="word" style="font-size: 1.2em;"/> <!-- Increase input size -->
+            <input type="submit" style="font-size: 1.2em;"/> <!-- Increase button size -->
+        </form>
+        <div class="sort-buttons">
+            <form action="/" method="get">
+                <button type="submit" name="sort" value="asc">오름차순 정렬</button>
+                <button type="submit" name="sort" value="desc">내림차순 정렬</button>
+            </form>
+        </div>
+        <div class="logout-button">
+            <form action="{{ url_for('logout') }}" method="post"> 
+                {% if is_admin or is_owner %}
+                <button type="submit">로그아웃</button>  
+                {% endif %}
+            </form>
+        </div>
+        <div class="login-button">
+            {% if not is_admin and not is_owner %}
+            <button onclick="redirectToPage('/login')">로그인</button>
+            
+
+            {% endif %}
+        </div>
+        <div class="setting-button">
+            {% if is_owner %}
+            <button onclick="redirectToPage('/config')">설정</button>
+            <img src="{{ url_for('static', filename='images/setting.jpg') }}" alt="설정" style="width: 20px; height: 20px;">   
+            {% endif %}
+        </div>
+    </div>
+    <div class="content">
+        <div class="table-container">
+            {% if is_admin or is_owner %}
+            <form action="/remove" method="post">
+                <input type="submit" value="선택한 항목 제거" class="delete-button">
+                {% endif %}
+                <table border="1">
+                    <tr>
+                        {% if is_admin or is_owner %}
+                        <td class="col1">선택</td>
+                        {% endif %}
+                        <td class="col2">빈도수</td>
+                        <td class="col3">비속어</td>
+                    </tr>
+                    
+                    {% for word in words %}
+                    <tr>
+                        {% if is_admin or is_owner %}
+                        <td class="col1"><input type="checkbox" name="words" value="{{ word[1] }}"></td>
+                        {% endif %}
+                        <td class="col2">빈도수 : {{ word[0] }} </td>
+                        <td class="col3"> {{ word[1] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </form>
+            
+            <p>비속어 개수: {{ words|length }}</p> <!-- Display the count of bad words -->
+            
+        </div>
+    </div>
+</body>
+</html>
