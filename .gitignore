@@ -1,7 +1,4 @@
 env/*
 env
 *.db
-*/__pycache__
-app/__pycache__
-ai_filter/__pycache__
-yellow-bot-Indev-main/__pycache__
+**/__pycache__/
